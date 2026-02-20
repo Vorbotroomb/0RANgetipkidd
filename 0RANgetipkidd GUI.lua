@@ -1,34 +1,30 @@
--- Configurações de Cores e Atmosfera (Disco Fog)
-local function startDiscoFog()
-    spawn(function()
-        game.Lighting.FogEnd = 500 -- Distância da neblina (mais perto = mais intenso)
-        game.Lighting.FogStart = 0
-        
-        while true do
-            local randomColor = Color3.new(math.random(), math.random(), math.random())
-            
-            -- Muda a cor da neblina e do céu ao mesmo tempo
-            game.Lighting.FogColor = randomColor
-            game.Lighting.Ambient = randomColor
-            game.Lighting.OutdoorAmbient = randomColor
-            
-            -- Faz as peças do mapa piscarem também
-            for _, part in pairs(game.Workspace:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.Color = randomColor
-                end
-            end
-            task.wait(0.1) -- Velocidade do flash
-        end
-    end)
-end
+-- [[ TS SERVER HIJACKED - LOADSTRING VERSION ]]
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local ExecuteBtn = Instance.new("TextButton")
 
-function click()
+ScreenGui.Parent = game:GetService("CoreGui")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.Position = UDim2.new(0.4, 0, 0.4, 0)
+MainFrame.Size = UDim2.new(0, 200, 0, 100)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+ExecuteBtn.Name = "ExecuteBtn"
+ExecuteBtn.Parent = MainFrame
+ExecuteBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+ExecuteBtn.Size = UDim2.new(1, 0, 1, 0)
+ExecuteBtn.Text = "EXECUTAR HACK"
+ExecuteBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ExecuteBtn.TextSize = 20
+
+local function startHack()
     local assetId = "rbxassetid://88572708174671"
     local musicId = "rbxassetid://82089023094290"
     local hintText = "ts server got hijacked lul"
 
-    -- 1. Hint e Som (Volume alto)
     local hint = Instance.new("Hint", game.Workspace)
     hint.Text = hintText
     
@@ -38,18 +34,29 @@ function click()
     sound.Looped = true
     sound:Play()
 
-    -- 2. Inicia o Disco Fog
-    startDiscoFog()
+    task.spawn(function()
+        game.Lighting.FogEnd = 500
+        game.Lighting.FogStart = 0
+        while true do
+            local color = Color3.new(math.random(), math.random(), math.random())
+            game.Lighting.FogColor = color
+            game.Lighting.Ambient = color
+            game.Lighting.OutdoorAmbient = color
+            for _, v in pairs(game.Workspace:GetDescendants()) do
+                if v:IsA("BasePart") then
+                    v.Color = color
+                    v.Material = Enum.Material.Neon
+                end
+            end
+            task.wait(0.1)
+        end
+    end)
 
-    -- 3. Função de Decal Spam e Material Neon
-    local function exPro(root)
+    local function applySpam(root)
         for _, v in pairs(root:GetChildren()) do
             if v:IsA("Decal") and v.Texture ~= assetId then
                 v:Destroy()
             elseif v:IsA("BasePart") then
-                v.Material = Enum.Material.Neon -- Deixa o bloco brilhante
-                v.Transparency = 0
-                
                 local faces = {"Front", "Back", "Right", "Left", "Top", "Bottom"}
                 for _, faceName in pairs(faces) do
                     local d = Instance.new("Decal", v)
@@ -57,15 +64,11 @@ function click()
                     d.Texture = assetId
                 end
             end
-            -- Continua procurando em sub-pastas
-            if #v:GetChildren() > 0 then
-                exPro(v)
-            end
+            applySpam(v)
         end
     end
-
-    exPro(game.Workspace)
+    applySpam(game.Workspace)
+    MainFrame:Destroy()
 end
 
--- Conexão do botão (Coloque isso dentro do seu LocalScript da GUI)
-script.Parent.MouseButton1Down:Connect(click)
+ExecuteBtn.MouseButton1Click:Connect(startHack)
