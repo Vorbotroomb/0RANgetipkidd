@@ -1,74 +1,72 @@
--- [[ TS SERVER HIJACKED - LOADSTRING VERSION ]]
-local ScreenGui = Instance.new("ScreenGui")
-local MainFrame = Instance.new("Frame")
-local ExecuteBtn = Instance.new("TextButton")
+-- [[ UNIFICADO PARA DELTA - TS HIJACK ]]
 
-ScreenGui.Parent = game:GetService("CoreGui")
-MainFrame.Name = "MainFrame"
-MainFrame.Parent = ScreenGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-MainFrame.Position = UDim2.new(0.4, 0, 0.4, 0)
-MainFrame.Size = UDim2.new(0, 200, 0, 100)
-MainFrame.Active = true
-MainFrame.Draggable = true
+local function run_hijack()
+    local decalID = "rbxassetid://88572708174671"
+    local soundID = "rbxassetid://82089023094290"
 
-ExecuteBtn.Name = "ExecuteBtn"
-ExecuteBtn.Parent = MainFrame
-ExecuteBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-ExecuteBtn.Size = UDim2.new(1, 0, 1, 0)
-ExecuteBtn.Text = "EXECUTAR HACK"
-ExecuteBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-ExecuteBtn.TextSize = 20
+    -- 1. Hint de aviso
+    local h = Instance.new("Hint", workspace)
+    h.Text = "ts server got hijacked lul"
 
-local function startHack()
-    local assetId = "rbxassetid://88572708174671"
-    local musicId = "rbxassetid://82089023094290"
-    local hintText = "ts server got hijacked lul"
+    -- 2. Música
+    local s = Instance.new("Sound", workspace)
+    s.SoundId = soundID
+    s.Volume = 10
+    s.Looped = true
+    s:Play()
 
-    local hint = Instance.new("Hint", game.Workspace)
-    hint.Text = hintText
-    
-    local sound = Instance.new("Sound", game.Workspace)
-    sound.SoundId = musicId
-    sound.Volume = 10
-    sound.Looped = true
-    sound:Play()
-
+    -- 3. Efeito Disco Fog (Névoa e Cores)
     task.spawn(function()
-        game.Lighting.FogEnd = 500
+        game.Lighting.FogEnd = 400
         game.Lighting.FogStart = 0
-        while true do
+        game.Lighting.ClockTime = 0 -- Deixa de noite para o Neon brilhar mais
+        
+        while task.wait(0.1) do
             local color = Color3.new(math.random(), math.random(), math.random())
             game.Lighting.FogColor = color
             game.Lighting.Ambient = color
             game.Lighting.OutdoorAmbient = color
-            for _, v in pairs(game.Workspace:GetDescendants()) do
+            
+            -- Aplicar cores nos blocos
+            for _, v in pairs(workspace:GetDescendants()) do
                 if v:IsA("BasePart") then
                     v.Color = color
                     v.Material = Enum.Material.Neon
                 end
             end
-            task.wait(0.1)
         end
     end)
 
-    local function applySpam(root)
-        for _, v in pairs(root:GetChildren()) do
-            if v:IsA("Decal") and v.Texture ~= assetId then
-                v:Destroy()
-            elseif v:IsA("BasePart") then
-                local faces = {"Front", "Back", "Right", "Left", "Top", "Bottom"}
-                for _, faceName in pairs(faces) do
-                    local d = Instance.new("Decal", v)
-                    d.Face = faceName
-                    d.Texture = assetId
-                end
+    -- 4. Spam de Decals em todas as faces
+    for _, part in pairs(workspace:GetDescendants()) do
+        if part:IsA("BasePart") then
+            local faces = {"Front", "Back", "Left", "Right", "Top", "Bottom"}
+            for _, face in pairs(faces) do
+                local d = Instance.new("Decal", part)
+                d.Texture = decalID
+                d.Face = face
             end
-            applySpam(v)
         end
     end
-    applySpam(game.Workspace)
-    MainFrame:Destroy()
 end
 
-ExecuteBtn.MouseButton1Click:Connect(startHack)
+-- Criar a interface que o Delta vai mostrar
+local sg = Instance.new("ScreenGui", game:GetService("CoreGui"))
+local frame = Instance.new("Frame", sg)
+frame.Size = UDim2.new(0, 200, 0, 100)
+frame.Position = UDim2.new(0.5, -100, 0.4, 0)
+frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+frame.BorderSizePixel = 2
+
+local btn = Instance.new("TextButton", frame)
+btn.Size = UDim2.new(0.9, 0, 0.8, 0)
+btn.Position = UDim2.new(0.05, 0, 0.1, 0)
+btn.Text = "EXECUTAR TS"
+btn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+btn.TextColor3 = Color3.new(1, 1, 1)
+btn.TextScaled = true
+
+btn.MouseButton1Click:Connect(function()
+    run_hijack()
+    sg:Destroy() -- Fecha a GUI após ativar o script
+end)
