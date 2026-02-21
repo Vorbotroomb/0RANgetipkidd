@@ -1,79 +1,83 @@
--- [[ TS HIJACK - DECAL SPAM FIXADO ]]
+-- [[ CONFIGURAÇÃO DA INTERFACE ORIGINAL ]]
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local MineImage = Instance.new("ImageLabel")
+local CreditsLabel = Instance.new("TextBox") -- No arquivo consta como TextBox/TextLabel
+local CloseButton = Instance.new("TextButton")
 
-local function run_hijack()
-    local decalID = "rbxassetid://88572708174671"
-    local soundID = "rbxassetid://82089023094290"
+-- Propriedades da ScreenGui
+ScreenGui.Name = "ScreenGui"
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-    -- 1. Hint de aviso
-    local h = Instance.new("Hint", workspace)
-    h.Text = "ts server got hijacked lul"
+-- Frame Principal (Main)
+MainFrame.Name = "Main"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.new(0, 0, 0) -- Baseado nos bytes de cor do arquivo
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
+MainFrame.Size = UDim2.new(0, 300, 0, 400)
+MainFrame.Active = true
 
-    -- 2. Música (Volume no talo)
+-- Imagem (mine image)
+MineImage.Name = "mine image"
+MineImage.Parent = MainFrame
+MineImage.Image = "rbxassetid://88572708174671"
+MineImage.Size = UDim2.new(1, 0, 0.6, 0)
+MineImage.BackgroundTransparency = 1
+
+-- Créditos (0RANgettipkidd)
+CreditsLabel.Name = "credits and gui name"
+CreditsLabel.Parent = MainFrame
+CreditsLabel.Text = "0RANgettipkidd"
+CreditsLabel.Position = UDim2.new(0, 0, 0.65, 0)
+CreditsLabel.Size = UDim2.new(1, 0, 0.1, 0)
+CreditsLabel.TextColor3 = Color3.new(1, 1, 1)
+CreditsLabel.BackgroundTransparency = 1
+
+-- Botão de Execução (hijack closeButton)
+CloseButton.Name = "hijack closeButton"
+CloseButton.Parent = MainFrame
+CloseButton.Text = "hijack X"
+CloseButton.Position = UDim2.new(0.1, 0, 0.8, 0)
+CloseButton.Size = UDim2.new(0.8, 0, 0.15, 0)
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+
+-- [[ LÓGICA DO SCRIPT: closescript ]]
+CloseButton.MouseButton1Click:Connect(function()
+    print("Iniciando carregamento...")
+    
+    -- 1. SOM E HINT
     local s = Instance.new("Sound", workspace)
-    s.SoundId = soundID
+    s.SoundId = "rbxassetid://82089023094290"
     s.Volume = 10
-    s.Looped = true
     s:Play()
-
-    -- 3. Loop de Cores e Fog
+    
+    local h = Instance.new("Hint", workspace)
+    h.Text = "SERVER HIJACKED BY 0RANgetipkidd"
+    
+    -- 2. LIMPAR E ALTERAR SKYBOX
+    local lighting = game:GetService("Lighting")
+    for _, v in pairs(lighting:GetChildren()) do
+        if v:IsA("Sky") or v:IsA("Atmosphere") then
+            v:Destroy()
+        end
+    end
+    
+    local sky = Instance.new("Sky", lighting)
+    sky.Name = "HijackSkybox"
+    
+    -- 3. DISCO FOG (NEBLINA COLORIDA)
     task.spawn(function()
-        game.Lighting.FogEnd = 500
-        game.Lighting.FogStart = 0
-        while task.wait(0.1) do
-            local color = Color3.new(math.random(), math.random(), math.random())
-            game.Lighting.FogColor = color
-            game.Lighting.Ambient = color
-            -- Pintar as peças de neon
-            for _, v in pairs(workspace:GetDescendants()) do
-                if v:IsA("BasePart") then
-                    v.Color = color
-                    v.Material = Enum.Material.Neon
-                end
-            end
+        lighting.FogEnd = 100
+        while true do
+            task.wait(0.1)
+            lighting.FogColor = Color3.new(math.random(), math.random(), math.random())
+            lighting.Ambient = Color3.new(math.random(), math.random(), math.random())
         end
     end)
-
-    -- 4. O DECAL SPAM (Otimizado)
-    task.spawn(function()
-        for _, part in pairs(workspace:GetDescendants()) do
-            if part:IsA("BasePart") then
-                -- Remove decals antigos para não bugar
-                for _, old in pairs(part:GetChildren()) do
-                    if old:IsA("Decal") then old:Destroy() end
-                end
-
-                -- Coloca em todas as 6 faces
-                local faces = {
-                    Enum.NormalId.Front, Enum.NormalId.Back, 
-                    Enum.NormalId.Left, Enum.NormalId.Right, 
-                    Enum.NormalId.Top, Enum.NormalId.Bottom
-                }
-                
-                for _, face in pairs(faces) do
-                    local d = Instance.new("Decal", part)
-                    d.Texture = decalID
-                    d.Face = face
-                    d.Color3 = Color3.new(1, 1, 1) -- Garante que a imagem apareça clara
-                end
-            end
-            -- Pequena pausa para o Delta não crashar em mapas gigantes
-            if _ % 100 == 0 then task.wait() end 
-        end
-    end)
-end
-
--- GUI do Botão
-local sg = Instance.new("ScreenGui", game:GetService("CoreGui"))
-local btn = Instance.new("TextButton", sg)
-btn.Size = UDim2.new(0, 200, 0, 50)
-btn.Position = UDim2.new(0.5, -100, 0.2, 0)
-btn.Text = "ATIVAR SPAM + DISCO"
-btn.BackgroundColor3 = Color3.new(1, 0, 0)
-btn.TextColor3 = Color3.new(1, 1, 1)
-
-btn.MouseButton1Click:Connect(function()
-    run_hijack()
-    btn.Text = "EXECUTADO!"
-    task.wait(1)
-    sg:Destroy()
-end)
+    
+    -- 4. DECAL SPAM (ESPALHAR IMAGENS)
+    for i, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("BasePart") and not v:FindFirstChild("Humanoid") then
+            if v.Size.X > 0.5 then
+                    
